@@ -59,15 +59,18 @@ app.post('/new_contact', (req, res) => {
 app.post('/view_contact', (req, res) => {
     var alldoc = "Following are the contacts";
     db.get(req.body.phone, {revs_info: true}, (err, body) => {
-        if (!err) {
-            console.log(body)
+        if (err) {
+            var jsonResponse;
+            if (err.statusCode == 404) {
+                jsonResponse = { code: err.statusCode, message: "Required resource not found" }
+            } else {
+                jsonResponse = { code: 1000, message: "Unknown error" }
+            }
+            res.status(jsonResponse.code)
+            res.json(jsonResponse)
+            return
         }
-        if (body) {
-            alldoc += "Name: " + body.name + "<br/> Phone number: " + body.phone
-        } else {
-            alldoc = "No records found";
-        }
-        res.send(alldoc)
+        res.json({id: body._id, name: body.name, phone: body.phone, crazy: body.crazy})
     });
 });
 
@@ -79,6 +82,7 @@ app.delete('/delete_contact', (req, res) => {
         if (!err) {
             db.destroy(req.body.phone, body._rev, (err, body) => {
                 if (err) {
+                    res.status(err.statusCode)
                     res.send("Error deleting contact");
                     return
                 }
@@ -86,11 +90,20 @@ app.delete('/delete_contact', (req, res) => {
             });
             return
         }
-        res.send("Contact not found")
+        // Error handler
+        var jsonResponse;
+        if (err.statusCode == 404) {
+            jsonResponse = { code: err.statusCode, message: "Required resource not found" }
+        } else {
+            jsonResponse = { code: 1000, message: "Unknown error" }
+        }
+        res.status(jsonResponse.code);
+        res.json(jsonResponse);
     });
-});
+}); 
 
 
-http.createServer(app).listen(app.get('port'), () => {
+http.createServer(app).listen(app.get('port'), (req, res) => {
     console.log("Express server listening on port", + app.get('port'));
 });
+
