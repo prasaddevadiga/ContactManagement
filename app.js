@@ -72,7 +72,6 @@ app.post('/view_contact', (req, res) => {
 });
 
 
-
 // Deleting contacts
 
 app.delete('/delete_contact', (req, res) => {
