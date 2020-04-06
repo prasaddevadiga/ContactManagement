@@ -48,13 +48,16 @@ app.post('/new_contact', (req, res) => {
                 res.send("Contact created successfully");
             })
         } else {
-            res.send("Contact already present")
+            res.send("Contact already present in the server")
         }
     })
 })
 
-
 // View contact post request
+
+var getUnkonwError = () => {
+    return { code: 1000, message: "Unknown error" }
+}
 
 app.post('/view_contact', (req, res) => {
     var alldoc = "Following are the contacts";
@@ -64,7 +67,7 @@ app.post('/view_contact', (req, res) => {
             if (err.statusCode == 404) {
                 jsonResponse = { code: err.statusCode, message: "Required resource not found" }
             } else {
-                jsonResponse = { code: 1000, message: "Unknown error" }
+                jsonResponse = getUnkonwError()
             }
             res.status(jsonResponse.code)
             res.json(jsonResponse)
@@ -95,7 +98,7 @@ app.delete('/delete_contact', (req, res) => {
         if (err.statusCode == 404) {
             jsonResponse = { code: err.statusCode, message: "Required resource not found" }
         } else {
-            jsonResponse = { code: 1000, message: "Unknown error" }
+            jsonResponse = getUnkonwError()
         }
         res.status(jsonResponse.code);
         res.json(jsonResponse);
